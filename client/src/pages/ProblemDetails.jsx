@@ -1,14 +1,22 @@
 import { useEffect, useState } from 'react';
+
 import {
   Card,
   Typography,
   Tag,
   Spin,
-  message,
   Button,
+  message,
 } from 'antd';
 
-import { useNavigate, useParams } from 'react-router-dom';
+import {
+  ArrowLeftOutlined,
+} from '@ant-design/icons';
+
+import {
+  useNavigate,
+  useParams,
+} from 'react-router-dom';
 
 import { getProblem } from '../services/problemService';
 
@@ -44,7 +52,7 @@ function ProblemDetails() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-20">
+      <div className="flex min-h-[60vh] items-center justify-center">
         <Spin size="large" />
       </div>
     );
@@ -55,12 +63,15 @@ function ProblemDetails() {
   }
 
   return (
-    <div>
+    <div className="w-full">
       <Button
+        icon={<ArrowLeftOutlined />}
         className="mb-4"
-        onClick={() => navigate('/problems')}
+        onClick={() =>
+          navigate('/problems')
+        }
       >
-        Back
+        Back to Problems
       </Button>
 
       <Card>
@@ -68,18 +79,36 @@ function ProblemDetails() {
           {problem.title}
         </Title>
 
-        <div className="mb-4">
-          <Tag>{problem.difficulty}</Tag>
-          <Tag>{problem.topic}</Tag>
+        <div className="mb-6">
+          <Tag>
+            {problem.difficulty}
+          </Tag>
+
+          <Tag>
+            {problem.topic}
+          </Tag>
         </div>
 
         <Title level={4}>
-          Problem
+          Problem Description
         </Title>
 
         <Text>
           {problem.description}
         </Text>
+
+        <div className="mt-6">
+          <Button
+            type="primary"
+            onClick={() =>
+              navigate(
+                `/assistant?problem=${problem.id}`
+              )
+            }
+          >
+            Solve with AI Assistant
+          </Button>
+        </div>
       </Card>
     </div>
   );

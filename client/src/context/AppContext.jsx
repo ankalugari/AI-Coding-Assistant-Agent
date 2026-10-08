@@ -1,93 +1,67 @@
-import { createContext, useContext, useState } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 
-const AppContext = createContext();
+import { getCurrentUser } from '../services/authService';
 
-export function AppProvider({ children }) {
-  const [language, setLanguage] = useState('javascript');
+const AuthContext = createContext();
 
-  const [messages, setMessages] = useState([
-    {
-      role: 'assistant',
-      content:
-        'Hi! I am CodeMentor AI. How can I help you with coding?',
-    },
-  ]);
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const [currentProblem, setCurrentProblem] = useState(null);
+  useEffect(() => {
+    const loadUser = async () => {
+      const token = localStorage.getItem('token');
 
-  const [loading, setLoading] = useState(false);
+      if (!token) {
+        setLoading(false);
+        return;
+      }
 
-  const [hintLevel, setHintLevel] = useState(1);
+      try {
+        const data = await getCurrentUser();
 
-  const [userMemory, setUserMemory] = useState({
-    level: 'Beginner',
-    preferredLanguage: 'JavaScript',
-    learningStyle: 'Simple Explanation',
-    weakTopics: [],
-    strongTopics: [],
-  });
+        setUser(data);
+      } catch (error) {
+        console.error('AUTH ERROR:', error);
 
-  const addMessage = (role, content) => {
-    setMessages((prev) => [
-      ...prev,
-      {
-        role,
-        content,
-      },
-    ]);
+        localStorage.removeItem('token');
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUser();
+  }, []);
+
+  const login = (userData) => {
+    setUser(userData);
   };
 
-  const clearMessages = () => {
-    setMessages([
-      {
-        role: 'assistant',
-        content:
-          'Hi! I am CodeMentor AI. How can I help you with coding?',
-      },
-    ]);
-  };
-
-  const resetHint = () => {
-    setHintLevel(1);
-  };
-
-  const nextHint = () => {
-    if (hintLevel < 5) {
-      setHintLevel(hintLevel + 1);
-    }
+  const logout = () => {
+    localStorage.removeItem('token');
+    setUser(null);
   };
 
   return (
-    <AppContext.Provider
+    <AuthContext.Provider
       value={{
-        language,
-        setLanguage,
-
-        messages,
-        setMessages,
-        addMessage,
-        clearMessages,
-
-        currentProblem,
-        setCurrentProblem,
-
+        user,
         loading,
-        setLoading,
-
-        hintLevel,
-        setHintLevel,
-        nextHint,
-        resetHint,
-
-        userMemory,
-        setUserMemory,
+        login,
+        logout,
       }}
     >
       {children}
-    </AppContext.Provider>
+    </AuthContext.Provider>
   );
 }
 
-export function useApp() {
-  return useContext(AppContext);
+export function useAuth() {
+  return useContext(AuthContext);
 }

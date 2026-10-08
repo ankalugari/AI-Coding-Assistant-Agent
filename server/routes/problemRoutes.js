@@ -10,7 +10,7 @@ router.get('/', authMiddleware, async (req, res) => {
     const [problems] = await db.execute(
       `SELECT id, title, description, difficulty, topic
        FROM coding_problems
-       ORDER BY id`
+       ORDER BY id DESC`
     );
 
     res.json(problems);
@@ -18,7 +18,7 @@ router.get('/', authMiddleware, async (req, res) => {
     console.error('PROBLEMS ERROR:', error);
 
     res.status(500).json({
-      message: 'Unable to get problems',
+      message: 'Unable to load problems',
     });
   }
 });
@@ -43,7 +43,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
     console.error('PROBLEM ERROR:', error);
 
     res.status(500).json({
-      message: 'Unable to get problem',
+      message: 'Unable to load problem',
     });
   }
 });

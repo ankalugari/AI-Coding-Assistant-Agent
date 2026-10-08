@@ -5,14 +5,28 @@ import {
   Navigate,
 } from 'react-router-dom';
 
+import { Spin } from 'antd';
+
+import { useAuth } from './context/AuthContext';
+
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import Problems from './pages/Problems';
+import ProblemDetails from './pages/ProblemDetails';
 
 function ProtectedRoute({ children }) {
-  const token = localStorage.getItem('token');
+  const { user, loading } = useAuth();
 
-  if (!token) {
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
 
@@ -23,7 +37,6 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-
         <Route
           path="/login"
           element={<Login />}
@@ -47,7 +60,7 @@ function App() {
           path="/"
           element={
             <Navigate
-              to="/login"
+              to="/dashboard"
               replace
             />
           }
@@ -57,11 +70,30 @@ function App() {
           path="*"
           element={
             <Navigate
-              to="/login"
+              to="/dashboard"
               replace
             />
           }
         />
+
+        <Route
+  path="/problems"
+  element={
+    <ProtectedRoute>
+      <Problems />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/problems/:id"
+  element={
+    <ProtectedRoute>
+      <ProblemDetails />
+    </ProtectedRoute>
+  }
+/>
+
 
       </Routes>
     </BrowserRouter>
