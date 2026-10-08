@@ -1,13 +1,5 @@
 import { Layout, Menu } from 'antd';
-import {
-  DashboardOutlined,
-  CodeOutlined,
-  RobotOutlined,
-  BugOutlined,
-  CheckCircleOutlined,
-  BarChartOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import {DashboardOutlined,CodeOutlined,RobotOutlined,BugOutlined,CheckCircleOutlined,BarChartOutlined,UserOutlined,} from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const { Sider } = Layout;
@@ -33,21 +25,6 @@ function Sidebar() {
       label: 'AI Assistant',
     },
     {
-      key: '/review',
-      icon: <CheckCircleOutlined />,
-      label: 'Code Review',
-    },
-    {
-      key: '/debug',
-      icon: <BugOutlined />,
-      label: 'Debug',
-    },
-    {
-      key: '/progress',
-      icon: <BarChartOutlined />,
-      label: 'Progress',
-    },
-    {
       key: '/profile',
       icon: <UserOutlined />,
       label: 'Profile',
@@ -61,9 +38,7 @@ function Sidebar() {
       width={240}
       className="min-h-screen"
     >
-      <div className="px-5 py-5 text-xl font-bold text-white">
-        CodeMentor AI
-      </div>
+      <div className="px-5 py-5 text-xl font-bold text-white">CodeMentor AI</div>
 
       <Menu
         theme="dark"
