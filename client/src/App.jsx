@@ -14,6 +14,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Problems from './pages/Problems';
 import ProblemDetails from './pages/ProblemDetails';
+import Assistant from './pages/Assistant';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -37,6 +38,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+
         <Route
           path="/login"
           element={<Login />}
@@ -52,6 +54,33 @@ function App() {
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/problems"
+          element={
+            <ProtectedRoute>
+              <Problems />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/problems/:id"
+          element={
+            <ProtectedRoute>
+              <ProblemDetails />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/assistant"
+          element={
+            <ProtectedRoute>
+              <Assistant />
             </ProtectedRoute>
           }
         />
@@ -75,25 +104,6 @@ function App() {
             />
           }
         />
-
-        <Route
-  path="/problems"
-  element={
-    <ProtectedRoute>
-      <Problems />
-    </ProtectedRoute>
-  }
-/>
-
-<Route
-  path="/problems/:id"
-  element={
-    <ProtectedRoute>
-      <ProblemDetails />
-    </ProtectedRoute>
-  }
-/>
-
 
       </Routes>
     </BrowserRouter>

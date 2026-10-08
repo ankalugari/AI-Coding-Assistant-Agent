@@ -3,100 +3,163 @@ const express = require('express');
 const authMiddleware = require('../middleware/authMiddleware');
 
 const {
-  askAssistant,
-  analyzeProblem,
-  generateHint,
-  reviewCode,
-  debugCode,
-  explainSolution,
-} = require('../services/aiService');
+  getConversation,
+  getMessages,
+} = require('../services/memoryService');
+
+const {
+  runAgent,
+} = require('../services/agentService');
 
 const router = express.Router();
 
 router.post(
-  '/assistant',
+  '/chat',
   authMiddleware,
   async (req, res) => {
     try {
-      const result = await askAssistant({
-        ...req.body,
-        userId: req.user.id,
+      const {
+        message,
+        intent,
+        problemId,
+      } = req.body;
+
+      if (!message) {
+        return res.status(400).json({
+          message: 'Message is required',
+        });
+      }
+
+      if (!problemId) {
+        return res.status(400).json({
+          message: 'Problem ID is required',
+        });
+      }
+
+      const userId = req.user.id;
+
+      const conversationId =
+        await getConversation(
+          userId,
+          problemId
+        );
+
+      const response = await runAgent({
+        userId,
+        conversationId,
+        message,
+        intent,
+        problemId,
       });
 
-      res.json(result);
+      res.json({
+        response,
+        conversationId,
+      });
     } catch (error) {
-      console.error(error);
+      console.error(
+        'AI CHAT ERROR:',
+        error
+      );
 
       res.status(500).json({
-        message: 'AI Assistant failed',
+        message: 'AI response failed',
       });
     }
   }
 );
 
-router.post(
-  '/analyze-problem',
+router.get(
+  '/history/:problemId',
   authMiddleware,
   async (req, res) => {
-    const result = await analyzeProblem({
-      ...req.body,
-      userId: req.user.id,
-    });
+    try {
+      const userId = req.user.id;
 
-    res.json(result);
+      const problemId =
+        req.params.problemId;
+
+      const conversationId =
+        await getConversation(
+          userId,
+          problemId
+        );
+
+      const messages =
+        await getMessages(
+          conversationId
+        );
+
+      res.json(messages);
+    } catch (error) {
+      console.error(
+        'CHAT HISTORY ERROR:',
+        error
+      );
+
+      res.status(500).json({
+        message:
+          'Unable to load chat history',
+      });
+    }
   }
 );
 
-router.post(
-  '/hint',
+router.delete(
+  '/history/:problemId',
   authMiddleware,
   async (req, res) => {
-    const result = await generateHint({
-      ...req.body,
-      userId: req.user.id,
-    });
+    try {
+      const userId = req.user.id;
+      const problemId = req.params.problemId;
 
-    res.json(result);
+      const [conversations] = await db.execute(
+        `SELECT id
+         FROM conversations
+         WHERE user_id = ?
+         AND problem_id = ?
+         ORDER BY id DESC
+         LIMIT 1`,
+        [userId, problemId]
+      );
+
+      if (conversations.length === 0) {
+        return res.status(404).json({
+          message: 'Chat not found',
+        });
+      }
+
+      const conversationId =
+        conversations[0].id;
+
+      await db.execute(
+        `DELETE FROM messages
+         WHERE conversation_id = ?`,
+        [conversationId]
+      );
+
+      await db.execute(
+        `DELETE FROM conversations
+         WHERE id = ?
+         AND user_id = ?`,
+        [conversationId, userId]
+      );
+
+      res.json({
+        message: 'Chat deleted successfully',
+      });
+    } catch (error) {
+      console.error(
+        'DELETE CHAT ERROR:',
+        error
+      );
+
+      res.status(500).json({
+        message: 'Unable to delete chat',
+      });
+    }
   }
 );
 
-router.post(
-  '/review',
-  authMiddleware,
-  async (req, res) => {
-    const result = await reviewCode({
-      ...req.body,
-      userId: req.user.id,
-    });
-
-    res.json(result);
-  }
-);
-
-router.post(
-  '/debug',
-  authMiddleware,
-  async (req, res) => {
-    const result = await debugCode({
-      ...req.body,
-      userId: req.user.id,
-    });
-
-    res.json(result);
-  }
-);
-
-router.post(
-  '/explain',
-  authMiddleware,
-  async (req, res) => {
-    const result = await explainSolution({
-      ...req.body,
-      userId: req.user.id,
-    });
-
-    res.json(result);
-  }
-);
 
 module.exports = router;

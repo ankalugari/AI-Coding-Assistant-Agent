@@ -19,7 +19,6 @@ import {
   DashboardOutlined,
   CodeOutlined,
   RobotOutlined,
-  BarChartOutlined,
   UserOutlined,
   LogoutOutlined,
   MenuOutlined,
@@ -67,16 +66,6 @@ function Problems() {
       icon: <RobotOutlined />,
       label: 'AI Assistant',
     },
-    {
-      key: 'progress',
-      icon: <BarChartOutlined />,
-      label: 'Progress',
-    },
-    {
-      key: 'profile',
-      icon: <UserOutlined />,
-      label: 'Profile',
-    },
   ];
 
   const handleMenuClick = ({ key }) => {
@@ -90,14 +79,6 @@ function Problems() {
 
     if (key === 'assistant') {
       navigate('/assistant');
-    }
-
-    if (key === 'progress') {
-      navigate('/progress');
-    }
-
-    if (key === 'profile') {
-      navigate('/profile');
     }
 
     setMobileMenu(false);
@@ -116,7 +97,10 @@ function Problems() {
 
         setProblems(data);
       } catch (error) {
-        console.error('PROBLEMS ERROR:', error);
+        console.error(
+          'PROBLEMS ERROR:',
+          error
+        );
 
         message.error(
           error.response?.data?.message ||
@@ -130,16 +114,21 @@ function Problems() {
     loadProblems();
   }, []);
 
-  const filteredProblems = problems.filter((problem) =>
-    problem.title
-      ?.toLowerCase()
-      .includes(search.toLowerCase())
+  const filteredProblems = problems.filter(
+    (problem) =>
+      problem.title
+        ?.toLowerCase()
+        .includes(search.toLowerCase()) ||
+      problem.topic
+        ?.toLowerCase()
+        .includes(search.toLowerCase())
   );
 
   const sidebar = (
-    <div className="flex h-full flex-col bg-black text-white">
+    <div className="flex h-screen flex-col bg-black text-white">
 
       <div className="px-5 py-6">
+
         <Title
           level={3}
           className="!mb-0 !text-white"
@@ -150,6 +139,7 @@ function Problems() {
         <Text className="text-gray-400">
           Coding Assistant
         </Text>
+
       </div>
 
       <div className="mx-4 mb-5 rounded-lg bg-gray-900 p-4">
@@ -207,16 +197,14 @@ function Problems() {
 
       <Sider
         width={250}
-        breakpoint="lg"
-        collapsedWidth="0"
-        className="hidden lg:block"
+        className="!fixed left-0 top-0 z-50 hidden h-screen lg:block"
       >
         {sidebar}
       </Sider>
 
-      <Layout>
+      <Layout className="lg:ml-[250px]">
 
-        <Header className="!flex !h-16 !items-center !justify-between !bg-black !px-4 sm:!px-6">
+        <Header className="!sticky !top-0 !z-40 !flex !h-16 !items-center !justify-between !bg-black !px-4 sm:!px-6">
 
           <div className="flex items-center gap-3">
 
@@ -226,7 +214,9 @@ function Problems() {
                 <MenuOutlined className="!text-white" />
               }
               className="lg:!hidden"
-              onClick={() => setMobileMenu(true)}
+              onClick={() =>
+                setMobileMenu(true)
+              }
             />
 
             <div>
@@ -264,7 +254,8 @@ function Problems() {
               </Title>
 
               <Text type="secondary">
-                Practice problems and improve your coding skills with CodeMentor AI.
+                Practice problems and improve your coding
+                skills with CodeMentor AI.
               </Text>
 
             </Card>
@@ -304,55 +295,57 @@ function Problems() {
 
               <Row gutter={[16, 16]}>
 
-                {filteredProblems.map((problem) => (
+                {filteredProblems.map(
+                  (problem) => (
 
-                  <Col
-                    xs={24}
-                    sm={12}
-                    lg={8}
-                    key={problem.id}
-                  >
-
-                    <Card
-                      hoverable
-                      className="h-full"
-                      onClick={() =>
-                        navigate(
-                          `/problems/${problem.id}`
-                        )
-                      }
+                    <Col
+                      xs={24}
+                      sm={12}
+                      lg={8}
+                      key={problem.id}
                     >
 
-                      <CodeOutlined className="mb-4 text-3xl" />
-
-                      <Title
-                        level={4}
-                        className="!mb-3"
+                      <Card
+                        hoverable
+                        className="h-full"
+                        onClick={() =>
+                          navigate(
+                            `/problems/${problem.id}`
+                          )
+                        }
                       >
-                        {problem.title}
-                      </Title>
 
-                      <div className="mb-3">
+                        <CodeOutlined className="mb-4 text-3xl" />
 
-                        <Tag>
-                          {problem.difficulty}
-                        </Tag>
+                        <Title
+                          level={4}
+                          className="!mb-3"
+                        >
+                          {problem.title}
+                        </Title>
 
-                        <Tag>
-                          {problem.topic}
-                        </Tag>
+                        <div className="mb-3">
 
-                      </div>
+                          <Tag>
+                            {problem.difficulty}
+                          </Tag>
 
-                      <Text type="secondary">
-                        {problem.description}
-                      </Text>
+                          <Tag>
+                            {problem.topic}
+                          </Tag>
 
-                    </Card>
+                        </div>
 
-                  </Col>
+                        <Text type="secondary">
+                          {problem.description}
+                        </Text>
 
-                ))}
+                      </Card>
+
+                    </Col>
+
+                  )
+                )}
 
               </Row>
 
@@ -367,7 +360,9 @@ function Problems() {
       <Drawer
         placement="left"
         open={mobileMenu}
-        onClose={() => setMobileMenu(false)}
+        onClose={() =>
+          setMobileMenu(false)
+        }
         width={270}
         styles={{
           body: {

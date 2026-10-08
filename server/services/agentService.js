@@ -1,153 +1,66 @@
 const { askGroq } = require('./groqService');
 
-function detectIntent(message) {
-  const text = message.toLowerCase();
+const {
+  saveMessage,
+  getMessages,
+} = require('./memoryService');
 
-  if (
-    text.includes('debug') ||
-    text.includes('error') ||
-    text.includes('bug')
-  ) {
-    return 'DEBUG_CODE';
-  }
+async function runAgent({
+  userId,
+  conversationId,
+  message,
+  intent,
+  problemId,
+}) {
+  await saveMessage(
+    conversationId,
+    'user',
+    message
+  );
 
-  if (
-    text.includes('review') ||
-    text.includes('improve my code')
-  ) {
-    return 'REVIEW_CODE';
-  }
+  const oldMessages = await getMessages(
+    conversationId
+  );
 
-  if (
-    text.includes('hint') ||
-    text.includes('clue')
-  ) {
-    return 'GENERATE_HINT';
-  }
-
-  if (
-    text.includes('explain solution')
-  ) {
-    return 'EXPLAIN_SOLUTION';
-  }
-
-  if (
-    text.includes('what is') ||
-    text.includes('explain')
-  ) {
-    return 'EXPLAIN_CONCEPT';
-  }
-
-  return 'ASK_FOLLOW_UP';
-}
-
-async function runAgent(message, code, language, hintLevel) {
-  const intent = detectIntent(message);
-
-  let prompt = '';
-
-  if (intent === 'DEBUG_CODE') {
-    prompt = `
+  let prompt = `
 You are CodeMentor AI.
 
-Help the user debug their code.
+The user is learning programming.
 
-Language:
-${language || 'Not provided'}
+Intent:
+${intent || 'ASK_FOLLOW_UP'}
 
-Code:
-${code || 'No code provided'}
+Problem ID:
+${problemId || 'None'}
 
-Question:
-${message}
+Previous conversation:
+`;
 
-Explain:
-1. What is wrong
-2. Why it is wrong
-3. How to fix it
+  for (let i = 0; i < oldMessages.length; i++) {
+    prompt += `
+${oldMessages[i].role}: ${oldMessages[i].content}
 `;
   }
 
-  else if (intent === 'REVIEW_CODE') {
-    prompt = `
-You are CodeMentor AI.
-
-Review this code.
-
-Language:
-${language || 'Not provided'}
-
-Code:
-${code || 'No code provided'}
-
-Question:
+  prompt += `
+Current user question:
 ${message}
 
-Explain:
-1. What is good
-2. What can be improved
-3. Possible bugs
-4. Suggestions
+Give a simple beginner-friendly response.
+Do not give the complete coding solution unless the user asks for it.
 `;
-  }
-
-  else if (intent === 'GENERATE_HINT') {
-    prompt = `
-You are CodeMentor AI.
-
-Give a coding hint.
-
-Hint level:
-${hintLevel || 1}
-
-Problem:
-${message}
-
-Do not give the complete solution.
-Give only a useful hint.
-`;
-  }
-
-  else if (intent === 'EXPLAIN_SOLUTION') {
-    prompt = `
-You are CodeMentor AI.
-
-Explain this solution in simple language.
-
-Question:
-${message}
-
-Code:
-${code || 'No code provided'}
-
-Explain the logic step by step.
-Also explain time and space complexity.
-`;
-  }
-
-  else {
-    prompt = `
-You are CodeMentor AI.
-
-Answer this programming question in simple beginner-friendly language.
-
-Question:
-${message}
-
-Give examples when useful.
-`;
-  }
 
   const response = await askGroq(prompt);
 
-  return {
-    intent,
-    response,
-    hintLevel: hintLevel || 1
-  };
+  await saveMessage(
+    conversationId,
+    'assistant',
+    response
+  );
+
+  return response;
 }
 
 module.exports = {
   runAgent,
-  detectIntent
 };
