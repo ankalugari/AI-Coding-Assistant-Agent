@@ -9,12 +9,14 @@ export async function registerUser(data) {
 export async function loginUser(data) {
   const response = await api.post('/auth/login', data);
 
-  if (response.data.token) {
-    localStorage.setItem(
-      'token',
-      response.data.token
-    );
-  }
+  console.log('LOGIN RESPONSE:', response.data);
+
+  localStorage.setItem('token', response.data.token);
+
+  console.log(
+    'SAVED TOKEN:',
+    localStorage.getItem('token')
+  );
 
   return response.data;
 }

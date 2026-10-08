@@ -9,11 +9,7 @@ const router = express.Router();
 
 router.post('/register', async (req, res) => {
   try {
-    const {
-      name,
-      email,
-      password,
-    } = req.body;
+    const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({
@@ -32,20 +28,11 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    const hashedPassword = await bcrypt.hash(
-      password,
-      10
-    );
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const [result] = await db.execute(
-      `INSERT INTO users
-      (name, email, password)
-      VALUES (?, ?, ?)`,
-      [
-        name,
-        email,
-        hashedPassword,
-      ]
+      'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
+      [name, email, hashedPassword]
     );
 
     res.status(201).json({
@@ -63,13 +50,16 @@ router.post('/register', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   try {
-    const {
-      email,
-      password,
-    } = req.body;
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        message: 'Email and password are required',
+      });
+    }
 
     const [users] = await db.execute(
-      'SELECT * FROM users WHERE email = ?',
+      'SELECT id, name, email, password FROM users WHERE email = ?',
       [email]
     );
 
@@ -103,9 +93,9 @@ router.post('/login', async (req, res) => {
       }
     );
 
-    res.json({
+    res.status(200).json({
       message: 'Login successful',
-      token,
+      token: token,
       user: {
         id: user.id,
         name: user.name,
@@ -121,33 +111,27 @@ router.post('/login', async (req, res) => {
   }
 });
 
-router.get(
-  '/me',
-  authMiddleware,
-  async (req, res) => {
-    try {
-      const [users] = await db.execute(
-        `SELECT id, name, email
-         FROM users
-         WHERE id = ?`,
-        [req.user.id]
-      );
+router.get('/me', authMiddleware, async (req, res) => {
+  try {
+    const [users] = await db.execute(
+      'SELECT id, name, email FROM users WHERE id = ?',
+      [req.user.id]
+    );
 
-      if (users.length === 0) {
-        return res.status(404).json({
-          message: 'User not found',
-        });
-      }
-
-      res.json(users[0]);
-    } catch (error) {
-      console.error(error);
-
-      res.status(500).json({
-        message: 'Unable to get user',
+    if (users.length === 0) {
+      return res.status(404).json({
+        message: 'User not found',
       });
     }
+
+    res.json(users[0]);
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: 'Unable to get user',
+    });
   }
-);
+});
 
 module.exports = router;

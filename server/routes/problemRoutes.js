@@ -5,91 +5,47 @@ const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-router.get(
-  '/',
-  authMiddleware,
-  async (req, res) => {
-    try {
-      const [problems] = await db.execute(
-        `SELECT *
-         FROM coding_problems
-         ORDER BY id DESC`
-      );
+router.get('/', authMiddleware, async (req, res) => {
+  try {
+    const [problems] = await db.execute(
+      `SELECT id, title, description, difficulty, topic
+       FROM coding_problems
+       ORDER BY id`
+    );
 
-      res.json(problems);
-    } catch (error) {
-      console.error(error);
+    res.json(problems);
+  } catch (error) {
+    console.error('PROBLEMS ERROR:', error);
 
-      res.status(500).json({
-        message: 'Unable to get problems',
+    res.status(500).json({
+      message: 'Unable to get problems',
+    });
+  }
+});
+
+router.get('/:id', authMiddleware, async (req, res) => {
+  try {
+    const [problems] = await db.execute(
+      `SELECT *
+       FROM coding_problems
+       WHERE id = ?`,
+      [req.params.id]
+    );
+
+    if (problems.length === 0) {
+      return res.status(404).json({
+        message: 'Problem not found',
       });
     }
+
+    res.json(problems[0]);
+  } catch (error) {
+    console.error('PROBLEM ERROR:', error);
+
+    res.status(500).json({
+      message: 'Unable to get problem',
+    });
   }
-);
-
-router.get(
-  '/:id',
-  authMiddleware,
-  async (req, res) => {
-    try {
-      const [problems] = await db.execute(
-        `SELECT *
-         FROM coding_problems
-         WHERE id = ?`,
-        [req.params.id]
-      );
-
-      if (problems.length === 0) {
-        return res.status(404).json({
-          message: 'Problem not found',
-        });
-      }
-
-      res.json(problems[0]);
-    } catch (error) {
-      console.error(error);
-
-      res.status(500).json({
-        message: 'Unable to get problem',
-      });
-    }
-  }
-);
-
-router.post(
-  '/submit',
-  authMiddleware,
-  async (req, res) => {
-    try {
-      const {
-        problemId,
-        language,
-        code,
-      } = req.body;
-
-      await db.execute(
-        `INSERT INTO code_submissions
-        (user_id, problem_id, language, code)
-        VALUES (?, ?, ?, ?)`,
-        [
-          req.user.id,
-          problemId,
-          language,
-          code,
-        ]
-      );
-
-      res.json({
-        message: 'Submission saved',
-      });
-    } catch (error) {
-      console.error(error);
-
-      res.status(500).json({
-        message: 'Unable to save submission',
-      });
-    }
-  }
-);
+});
 
 module.exports = router;

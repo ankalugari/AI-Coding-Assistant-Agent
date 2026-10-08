@@ -7,18 +7,7 @@ export async function getProblems() {
 }
 
 export async function getProblem(id) {
-  const response = await api.get(
-    `/problems/${id}`
-  );
-
-  return response.data;
-}
-
-export async function submitProblem(data) {
-  const response = await api.post(
-    '/problems/submit',
-    data
-  );
+  const response = await api.get(`/problems/${id}`);
 
   return response.data;
 }
