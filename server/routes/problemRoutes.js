@@ -1,8 +1,6 @@
 const express = require('express');
-
 const db = require('../db');
 const authMiddleware = require('../middleware/authMiddleware');
-
 const router = express.Router();
 
 router.get('/', authMiddleware, async (req, res) => {
@@ -12,14 +10,10 @@ router.get('/', authMiddleware, async (req, res) => {
        FROM coding_problems
        ORDER BY id DESC`
     );
-
     res.json(problems);
   } catch (error) {
     console.error('PROBLEMS ERROR:', error);
-
-    res.status(500).json({
-      message: 'Unable to load problems',
-    });
+    res.status(500).json({message: 'Unable to load problems',});
   }
 });
 
@@ -41,7 +35,6 @@ router.get('/:id', authMiddleware, async (req, res) => {
     res.json(problems[0]);
   } catch (error) {
     console.error('PROBLEM ERROR:', error);
-
     res.status(500).json({
       message: 'Unable to load problem',
     });

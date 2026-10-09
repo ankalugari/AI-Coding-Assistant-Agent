@@ -1,10 +1,8 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
 const db = require('../db');
 const authMiddleware = require('../middleware/authMiddleware');
-
 const router = express.Router();
 
 router.post('/register', async (req, res) => {
@@ -29,7 +27,6 @@ router.post('/register', async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const [result] = await db.execute(
       'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
       [name, email, hashedPassword]

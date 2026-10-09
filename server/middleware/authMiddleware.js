@@ -4,9 +4,7 @@ function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    return res.status(401).json({
-      message: 'Authentication required',
-    });
+    return res.status(401).json({message: 'Authentication required',});
   }
 
   const token = authHeader.split(' ')[1];
@@ -18,20 +16,12 @@ function authMiddleware(req, res, next) {
   }
 
   try {
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET
-    );
-
+    const decoded = jwt.verify(token,process.env.JWT_SECRET);
     req.user = decoded;
-
     next();
   } catch (error) {
     console.error('JWT ERROR:', error.message);
-
-    return res.status(401).json({
-      message: 'Invalid or expired token',
-    });
+    return res.status(401).json({message: 'Invalid or expired token',});
   }
 }
 

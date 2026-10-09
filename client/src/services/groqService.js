@@ -23,6 +23,4 @@ async function askGroq(message) {
   return response.choices[0].message.content;
 }
 
-module.exports = {
-  askGroq,
-};
+module.exports = {askGroq,};

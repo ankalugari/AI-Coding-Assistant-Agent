@@ -1,43 +1,26 @@
 import { useState } from 'react';
-import {
-  Form,
-  Input,
-  Button,
-  Card,
-  Typography,
-  message,
-} from 'antd';
+import {Form,Input,Button,Card,Typography,message,} from 'antd';
 import { useNavigate, Link } from 'react-router-dom';
-
 import { registerUser } from '../services/authService';
 
 const { Title, Text } = Typography;
 
 function Register() {
   const navigate = useNavigate();
-
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async (values) => {
     try {
       setLoading(true);
-
       await registerUser({
         name: values.name,
         email: values.email,
         password: values.password,
       });
-
       message.success('Registration successful');
-
       navigate('/login');
     } catch (error) {
-      console.error('REGISTER ERROR:', error);
-
-      message.error(
-        error.response?.data?.message ||
-        'Registration failed'
-      );
+      message.error(error.response?.data?.message ||'Registration failed');
     } finally {
       setLoading(false);
     }

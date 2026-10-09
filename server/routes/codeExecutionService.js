@@ -85,6 +85,4 @@ async function runCode({
   );
 }
 
-module.exports = {
-  runCode,
-};
+module.exports = {runCode,};

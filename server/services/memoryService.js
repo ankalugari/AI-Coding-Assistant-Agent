@@ -79,9 +79,4 @@ async function getMessages(conversationId) {
   return messages;
 }
 
-module.exports = {
-  getConversation,
-  getExistingConversation,
-  saveMessage,
-  getMessages,
-};
+module.exports = {getConversation,getExistingConversation,saveMessage,getMessages,};

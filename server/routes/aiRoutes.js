@@ -1,73 +1,67 @@
 const express = require('express');
-
-const authMiddleware = require('../middleware/authMiddleware');
-
-const {
-  getConversation,
-  getMessages,
-} = require('../services/memoryService');
-
-const {
-  runAgent,
-} = require('../services/agentService');
-
 const router = express.Router();
+const authMiddleware = require('../middleware/authMiddleware');
+const db = require('../db');
+const {getConversation,getMessages,} = require('../services/memoryService');
 
-router.post(
-  '/chat',
-  authMiddleware,
-  async (req, res) => {
-    try {
-      const {
-        message,
-        intent,
-        problemId,
-      } = req.body;
+const {runAgent,} = require('../services/agentService');
 
-      if (!message) {
-        return res.status(400).json({
-          message: 'Message is required',
-        });
-      }
+router.post('/chat', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const {message,problemId,code,language,intent,} = req.body;
 
-      if (!problemId) {
-        return res.status(400).json({
-          message: 'Problem ID is required',
-        });
-      }
-
-      const userId = req.user.id;
-
-      const conversationId =
-        await getConversation(
-          userId,
-          problemId
-        );
-
-      const response = await runAgent({
-        userId,
-        conversationId,
-        message,
-        intent,
-        problemId,
-      });
-
-      res.json({
-        response,
-        conversationId,
-      });
-    } catch (error) {
-      console.error(
-        'AI CHAT ERROR:',
-        error
-      );
-
-      res.status(500).json({
-        message: 'AI response failed',
+    if (!message || !message.trim()) {
+      return res.status(400).json({
+        message: 'Message is required',
       });
     }
+
+    let conversationId;
+
+    if (problemId) {
+      conversationId = await getConversation(userId,problemId);
+    } else {
+      const [rows] = await db.execute(
+        `SELECT id
+         FROM conversations
+         WHERE user_id = ?
+         AND problem_id IS NULL
+         ORDER BY id DESC
+         LIMIT 1`,
+        [userId]
+      );
+
+      if (rows.length > 0) {
+        conversationId = rows[0].id;
+      } else {
+        const [result] = await db.execute(
+          `INSERT INTO conversations
+           (user_id, problem_id, title)
+           VALUES (?, NULL, ?)`,
+          [userId, 'General AI Assistant']
+        );
+        conversationId = result.insertId;
+      }
+    }
+
+    const response = await runAgent({
+      userId,
+      conversationId,
+      message: message.trim(),
+      intent,
+      problemId: problemId || null,
+      code,
+      language,
+    });
+    res.json({ response });
+  } catch (error) {
+    console.error('Chat error:', error);
+    res.status(500).json({
+      message: error.message || 'Failed to process your message',
+    });
   }
-);
+});
 
 router.get(
   '/history/:problemId',
@@ -75,31 +69,14 @@ router.get(
   async (req, res) => {
     try {
       const userId = req.user.id;
-
-      const problemId =
-        req.params.problemId;
-
-      const conversationId =
-        await getConversation(
-          userId,
-          problemId
-        );
-
-      const messages =
-        await getMessages(
-          conversationId
-        );
-
+      const problemId = req.params.problemId;
+      const conversationId = await getConversation(userId,problemId);
+      const messages = await getMessages(conversationId);
       res.json(messages);
     } catch (error) {
-      console.error(
-        'CHAT HISTORY ERROR:',
-        error
-      );
-
+      console.error('CHAT HISTORY ERROR:', error);
       res.status(500).json({
-        message:
-          'Unable to load chat history',
+        message: 'Unable to load chat history',
       });
     }
   }
@@ -112,7 +89,6 @@ router.delete(
     try {
       const userId = req.user.id;
       const problemId = req.params.problemId;
-
       const [conversations] = await db.execute(
         `SELECT id
          FROM conversations
@@ -129,8 +105,7 @@ router.delete(
         });
       }
 
-      const conversationId =
-        conversations[0].id;
+      const conversationId = conversations[0].id;
 
       await db.execute(
         `DELETE FROM messages
@@ -149,17 +124,12 @@ router.delete(
         message: 'Chat deleted successfully',
       });
     } catch (error) {
-      console.error(
-        'DELETE CHAT ERROR:',
-        error
-      );
-
+      console.error('DELETE CHAT ERROR:', error);
       res.status(500).json({
         message: 'Unable to delete chat',
       });
     }
   }
 );
-
 
 module.exports = router;

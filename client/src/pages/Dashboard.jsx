@@ -1,26 +1,7 @@
-import {
-  Layout,
-  Menu,
-  Card,
-  Avatar,
-  Typography,
-  Button,
-  Drawer,
-} from 'antd';
-
-import {
-  DashboardOutlined,
-  CodeOutlined,
-  RobotOutlined,
-  UserOutlined,
-  LogoutOutlined,
-  MenuOutlined,
-} from '@ant-design/icons';
-
+import {Layout,Menu,Card,Avatar,Typography,Button,Drawer,} from 'antd';
+import {DashboardOutlined,CodeOutlined,RobotOutlined,UserOutlined,LogoutOutlined,MenuOutlined,} from '@ant-design/icons';
 import { useState } from 'react';
-
 import { useNavigate } from 'react-router-dom';
-
 import { useAuth } from '../context/AuthContext';
 
 const { Sider, Header, Content } = Layout;
@@ -28,9 +9,7 @@ const { Title, Text } = Typography;
 
 function Dashboard() {
   const navigate = useNavigate();
-
   const { user, logout } = useAuth();
-
   const [mobileMenu, setMobileMenu] = useState(false);
 
   const menuItems = [
@@ -122,7 +101,6 @@ function Dashboard() {
       />
 
       <div className="mt-auto p-4">
-
         <Button
           block
           icon={<LogoutOutlined />}
@@ -131,28 +109,21 @@ function Dashboard() {
         >
           Logout
         </Button>
-
       </div>
-
     </div>
   );
 
   return (
     <Layout className="min-h-screen">
-
       <Sider
         width={250}
         className="!fixed left-0 top-0 z-50 hidden h-screen lg:block"
       >
         {sidebar}
       </Sider>
-
       <Layout className="lg:ml-[250px]">
-
         <Header className="!sticky !top-0 !z-40 !flex !h-16 !items-center !justify-between !bg-black !px-4 sm:!px-6">
-
           <div className="flex items-center gap-3">
-
             <Button
               type="text"
               icon={
@@ -161,58 +132,40 @@ function Dashboard() {
               className="lg:!hidden"
               onClick={() => setMobileMenu(true)}
             />
-
             <div>
-
               <div className="text-lg font-semibold text-white">
                 Dashboard
               </div>
-
               <div className="hidden text-xs text-gray-400 sm:block">
                 Your coding learning overview
               </div>
-
             </div>
-
           </div>
-
           <Avatar
             icon={<UserOutlined />}
             className="cursor-pointer"
           />
-
         </Header>
-
         <Content className="bg-gray-100 p-4 sm:p-6 lg:p-8">
-
           <div className="mx-auto max-w-7xl">
-
             <Card className="mb-6 border-0">
-
               <Title
                 level={2}
                 className="!mb-1"
               >
                 Welcome, {user?.name || 'User'} 👋
               </Title>
-
               <Text type="secondary">
                 Continue your coding journey with CodeMentor AI.
               </Text>
-
             </Card>
-
             <Card title="AI Assistant">
-
               <div className="flex flex-col items-center py-6 text-center">
-
                 <RobotOutlined className="mb-4 text-4xl" />
-
                 <Text type="secondary">
                   Ask CodeMentor AI for coding hints,
                   explanations, and debugging help.
                 </Text>
-
                 <Button
                   type="primary"
                   className="mt-4"
@@ -220,17 +173,11 @@ function Dashboard() {
                 >
                   Open Assistant
                 </Button>
-
               </div>
-
             </Card>
-
           </div>
-
         </Content>
-
       </Layout>
-
       <Drawer
         placement="left"
         open={mobileMenu}
@@ -245,7 +192,6 @@ function Dashboard() {
       >
         {sidebar}
       </Drawer>
-
     </Layout>
   );
 }

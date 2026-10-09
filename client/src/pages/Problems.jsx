@@ -1,53 +1,19 @@
-import {
-  Layout,
-  Menu,
-  Card,
-  Row,
-  Col,
-  Avatar,
-  Typography,
-  Button,
-  Drawer,
-  Input,
-  Tag,
-  Spin,
-  Empty,
-  message,
-} from 'antd';
-
-import {
-  DashboardOutlined,
-  CodeOutlined,
-  RobotOutlined,
-  UserOutlined,
-  LogoutOutlined,
-  MenuOutlined,
-  SearchOutlined,
-} from '@ant-design/icons';
-
+import {Layout,Menu,Card,Row,Col,Avatar,Typography,Button,Drawer,Input,Tag,Spin,Empty,message,} from 'antd';
+import {DashboardOutlined,CodeOutlined,RobotOutlined,UserOutlined,LogoutOutlined,MenuOutlined,SearchOutlined,} from '@ant-design/icons';
 import { useEffect, useState } from 'react';
-
 import { useNavigate } from 'react-router-dom';
-
 import { useAuth } from '../context/AuthContext';
-
 import { getProblems } from '../services/problemService';
 
 const { Sider, Header, Content } = Layout;
-
 const { Title, Text } = Typography;
 
 function Problems() {
   const navigate = useNavigate();
-
   const { user, logout } = useAuth();
-
   const [mobileMenu, setMobileMenu] = useState(false);
-
   const [problems, setProblems] = useState([]);
-
   const [search, setSearch] = useState('');
-
   const [loading, setLoading] = useState(true);
 
   const menuItems = [
@@ -86,7 +52,6 @@ function Problems() {
 
   const handleLogout = () => {
     logout();
-
     navigate('/login');
   };
 
@@ -94,14 +59,8 @@ function Problems() {
     const loadProblems = async () => {
       try {
         const data = await getProblems();
-
         setProblems(data);
       } catch (error) {
-        console.error(
-          'PROBLEMS ERROR:',
-          error
-        );
-
         message.error(
           error.response?.data?.message ||
           'Unable to load problems'
@@ -110,7 +69,6 @@ function Problems() {
         setLoading(false);
       }
     };
-
     loadProblems();
   }, []);
 
@@ -126,45 +84,33 @@ function Problems() {
 
   const sidebar = (
     <div className="flex h-screen flex-col bg-black text-white">
-
       <div className="px-5 py-6">
-
         <Title
           level={3}
           className="!mb-0 !text-white"
         >
           CodeMentor AI
         </Title>
-
         <Text className="text-gray-400">
           Coding Assistant
         </Text>
-
       </div>
 
       <div className="mx-4 mb-5 rounded-lg bg-gray-900 p-4">
-
         <div className="flex items-center gap-3">
-
           <Avatar
             size={42}
             icon={<UserOutlined />}
           />
-
           <div className="min-w-0">
-
             <div className="truncate font-semibold text-white">
               {user?.name || 'User'}
             </div>
-
             <div className="truncate text-sm text-gray-400">
               {user?.email || ''}
             </div>
-
           </div>
-
         </div>
-
       </div>
 
       <Menu
@@ -177,7 +123,6 @@ function Problems() {
       />
 
       <div className="mt-auto p-4">
-
         <Button
           block
           icon={<LogoutOutlined />}
@@ -186,9 +131,7 @@ function Problems() {
         >
           Logout
         </Button>
-
       </div>
-
     </div>
   );
 
@@ -276,35 +219,23 @@ function Problems() {
             </Card>
 
             {loading ? (
-
               <div className="flex min-h-[300px] items-center justify-center">
-
                 <Spin size="large" />
-
               </div>
-
             ) : filteredProblems.length === 0 ? (
-
               <Card>
-
                 <Empty description="No problems found" />
-
               </Card>
-
             ) : (
-
               <Row gutter={[16, 16]}>
-
                 {filteredProblems.map(
                   (problem) => (
-
                     <Col
                       xs={24}
                       sm={12}
                       lg={8}
                       key={problem.id}
                     >
-
                       <Card
                         hoverable
                         className="h-full"
@@ -314,49 +245,33 @@ function Problems() {
                           )
                         }
                       >
-
                         <CodeOutlined className="mb-4 text-3xl" />
-
                         <Title
                           level={4}
                           className="!mb-3"
                         >
                           {problem.title}
                         </Title>
-
                         <div className="mb-3">
-
                           <Tag>
                             {problem.difficulty}
                           </Tag>
-
                           <Tag>
                             {problem.topic}
                           </Tag>
-
                         </div>
-
                         <Text type="secondary">
                           {problem.description}
                         </Text>
-
                       </Card>
-
                     </Col>
-
                   )
                 )}
-
               </Row>
-
             )}
-
           </div>
-
         </Content>
-
       </Layout>
-
       <Drawer
         placement="left"
         open={mobileMenu}
@@ -373,7 +288,6 @@ function Problems() {
       >
         {sidebar}
       </Drawer>
-
     </Layout>
   );
 }

@@ -1,13 +1,5 @@
 import { useState } from 'react';
-import {
-  Typography,
-  Card,
-  Input,
-  Button,
-  Alert,
-  Tag,
-} from 'antd';
-
+import {Typography,Card,Input,Button,Alert,Tag,} from 'antd';
 import { BugOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
@@ -20,7 +12,6 @@ function Debug() {
 
   const handleDebug = () => {
     if (!error.trim() && !code.trim()) return;
-
     setResult(true);
   };
 
