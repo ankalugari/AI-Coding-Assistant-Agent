@@ -242,5 +242,6 @@ The backend exposes routes under `/api`:
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/9b0256e2-1af2-4019-8e6f-08828be39f36" />
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/d10cd793-52d7-4f9a-9683-0008d78756d0" />
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/242d1360-3eec-4573-ae71-b36d6849e2b3" />
+<img width="340" height="389" alt="image" src="https://github.com/user-attachments/assets/e62296c4-cab1-4a0c-a0af-97055cb28bfa" />
 
 
