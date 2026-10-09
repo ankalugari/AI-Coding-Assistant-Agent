@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
-
+import {createContext,useContext,useEffect,useState,} from 'react';
 import { getCurrentUser } from '../services/authService';
 
 const AuthContext = createContext();
@@ -21,14 +15,10 @@ export function AuthProvider({ children }) {
         setLoading(false);
         return;
       }
-
       try {
         const data = await getCurrentUser();
-
         setUser(data);
       } catch (error) {
-        console.error('AUTH ERROR:', error);
-
         localStorage.removeItem('token');
         setUser(null);
       } finally {
