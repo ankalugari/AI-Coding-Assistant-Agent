@@ -238,6 +238,9 @@ The backend exposes routes under `/api`:
 - The project is designed as a beginner-friendly educational assistant rather than a production-grade judge platform.
 - Some environment variables and credentials should remain local and not be committed to source control.
 
+## Link
+https://ai-coding-assistant-agent.vercel.app/login
+
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/fe93c811-e8c7-4de9-acbb-70420e0dd225" />
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/9b0256e2-1af2-4019-8e6f-08828be39f36" />
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/d10cd793-52d7-4f9a-9683-0008d78756d0" />
